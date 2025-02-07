@@ -1,0 +1,49 @@
+{
+ "cells": [
+  {
+   "cell_type": "raw",
+   "id": "51674b25-aacf-4c33-930c-6a882507f096",
+   "metadata": {},
+   "source": [
+    "# Vais a hacer una red CONVOLUCIONAL para el dataset de fashion de MNIST.\n",
+    "\n",
+    "# Cargar los datos, mostrar ejemplos, hacer un grafico de barra de que tan popular es cada clase, etc.\n",
+    "\n",
+    "# Hacer un modelo y entrenarlo.\n",
+    "\n",
+    "# Mostrar accuracy, dibujar matriz de confusión (DIBUJARLA).\n",
+    "\n",
+    "# Volver al punto 3 intentando mejorar al máximo vuestro modelo."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d1826ca4-0751-4422-b3c3-59cd618ae4cd",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

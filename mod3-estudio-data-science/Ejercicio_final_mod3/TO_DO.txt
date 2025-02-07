@@ -1,0 +1,2015 @@
+TO DO 1:------------------------------------------------------------------
+## **depth: TO DO
+Descripción: Proporción de profundidad del diamante.
+Se calcula como:
+depth = (z / (x + y)/2) × 100     
+
+Es un porcentaje que describe cuán profundo es el diamante en relación con su ancho promedio.
+
+La **proporción de profundidad (`depth`)** es un factor importante en la calidad visual de un diamante. Describe cuán profundo es un diamante en relación con su ancho promedio. Idealmente, para maximizar la reflexión de la luz y el brillo, la proporción de profundidad debe encontrarse en un rango óptimo.
+
+---
+
+### **Relaciones interesantes de `depth`**
+
+#### **1. Correlación entre `depth` y `price`**
+   - **¿Por qué?**: El precio del diamante puede estar influenciado por la proporción de profundidad, ya que una profundidad demasiado alta o baja podría reducir el atractivo visual del diamante.
+   - **Análisis esperado**: Podríamos encontrar una relación no lineal; los valores de profundidad fuera del rango óptimo probablemente tengan un impacto negativo en el precio.
+   ```python
+   corr_depth_price = df[['depth', 'price']].corr().iloc[0, 1]
+   print(f"Correlación entre Depth y Precio: {corr_depth_price:.2f}")
+   ```
+
+---
+
+#### **2. Correlación entre `depth` y dimensiones físicas (`x`, `y`, `z`)**
+   - **¿Por qué?**: `depth` se calcula directamente a partir de las dimensiones físicas. Su relación con `z` debe ser más fuerte, mientras que con `x` e `y` podría ser más moderada.
+   - **Análisis esperado**: `z` probablemente tenga una correlación fuerte y positiva con `depth`, ya que una mayor altura (`z`) aumenta la proporción de profundidad.
+   ```python
+   correlations = df[['depth', 'x', 'y', 'z']].corr()
+   print("Correlaciones entre Depth y Dimensiones:")
+   print(correlations)
+   ```
+
+---
+
+#### **3. Correlación entre `depth` y `table`**
+   - **¿Por qué?**: `depth` y `table` son medidas que interactúan en el rendimiento visual del diamante. Una tabla más grande tiende a estar asociada con una menor profundidad, mientras que una tabla más pequeña puede estar asociada con una mayor profundidad.
+   - **Análisis esperado**: Relación inversa moderada o débil.
+   ```python
+   corr_depth_table = df[['depth', 'table']].corr().iloc[0, 1]
+   print(f"Correlación entre Depth y Table: {corr_depth_table:.2f}")
+   ```
+
+---
+
+#### **4. Relación entre `depth` y `cut`**
+   - **¿Por qué?**: La proporción de profundidad afecta directamente la calidad del corte. Un "cut" ideal generalmente implica una profundidad dentro del rango recomendado.
+   - **Análisis esperado**: Profundidades fuera del rango óptimo deberían ser más comunes en cortes de menor calidad.
+   ```python
+   corr_cut = df.groupby('cut')['depth'].mean()
+   print("Profundidad promedio por tipo de corte:")
+   print(corr_cut)
+   ```
+
+---
+
+#### **5. Relación entre `depth` y `carat`**
+   - **¿Por qué?**: Una mayor profundidad podría dar la percepción de un diamante más grande, pero esto no siempre es cierto, ya que puede reducir la superficie visible desde arriba.
+   - **Análisis esperado**: Relación débil, pero podría haber tendencias en algunos cortes específicos.
+   ```python
+   corr_depth_carat = df[['depth', 'carat']].corr().iloc[0, 1]
+   print(f"Correlación entre Depth y Carat: {corr_depth_carat:.2f}")
+   ```
+
+---
+
+#### **6. Impacto de `depth` en la claridad y el color**
+   - **¿Por qué?**: Diamantes con proporciones de profundidad fuera del rango ideal pueden tener menor claridad visual o colores menos favorecedores debido a una dispersión menos eficiente de la luz.
+   ```python
+   corr_clarity = df.groupby('clarity')['depth'].mean()
+   corr_color = df.groupby('color')['depth'].mean()
+
+   print("Profundidad promedio por claridad:")
+   print(corr_clarity)
+   print("Profundidad promedio por color:")
+   print(corr_color)
+   ```
+
+---
+
+### **Visualizaciones sugeridas**
+
+1. **Boxplot de `depth` por `cut`**
+   ```python
+   sns.boxplot(data=df, x='cut', y='depth', palette='pastel')
+   plt.title("Distribución de Depth por Tipo de Corte")
+   plt.xlabel("Corte")
+   plt.ylabel("Proporción de Depth")
+   plt.show()
+   ```
+
+2. **Heatmap de correlaciones entre `depth` y otras variables**
+   ```python
+   plt.figure(figsize=(8, 6))
+   sns.heatmap(df[['depth', 'price', 'table', 'x', 'y', 'z', 'carat']].corr(), annot=True, cmap='coolwarm')
+   plt.title("Mapa de Calor de Correlaciones")
+   plt.show()
+   ```
+
+3. **Scatterplot entre `depth` y otras variables clave**
+   ```python
+   sns.scatterplot(data=df, x='depth', y='price', hue='cut', palette='cool', alpha=0.6)
+   plt.title("Relación entre Depth y Precio por Corte")
+   plt.xlabel("Proporción de Depth")
+   plt.ylabel("Precio")
+   plt.show()
+   ```
+
+---
+
+Estas correlaciones y visualizaciones pueden ayudarte a entender cómo la proporción de profundidad interactúa con las características físicas, visuales y de calidad del diamante.
+
+TO DO 2:---------------------------------------------------------------------------
+## **table: TO DO
+Representa el ancho de la parte superior del diamante (la "tabla") como porcentaje del ancho promedio del diamante. Unidades: Porcentaje.
+Impacto: Una tabla ideal se encuentra entre 53%-57% para maximizar la reflexión de la luz.
+
+Para analizar y representar gráficamente la variable **table** (relación de la tabla del diamante como porcentaje del ancho promedio) e interpretar su impacto en la reflexión de la luz, te sugiero las siguientes gráficas:
+
+---
+
+### 1. **Histograma con rangos ideales destacados**
+   - Muestra la distribución de la variable `table` con los rangos ideales (53%-57%) resaltados.
+   ```python
+   plt.figure(figsize=(10, 6))
+   sns.histplot(df['table'], bins=50, kde=True, color='blue', alpha=0.6)
+   plt.axvspan(53, 57, color='green', alpha=0.3, label='Rango Ideal (53%-57%)')
+   plt.title("Distribución de Table con Rango Ideal")
+   plt.xlabel("Table (%)")
+   plt.ylabel("Frecuencia")
+   plt.legend()
+   plt.grid(axis='y', linestyle='--', alpha=0.7)
+   plt.show()
+   ```
+
+---
+
+### 2. **Boxplot por categoría de corte (cut)**
+   - Compara cómo varía la tabla entre diferentes categorías de corte.
+   ```python
+   plt.figure(figsize=(12, 6))
+   sns.boxplot(data=df, x='cut', y='table', palette='Set2')
+   plt.axhspan(53, 57, color='green', alpha=0.2, label='Rango Ideal (53%-57%)')
+   plt.title("Distribución de Table por Tipo de Corte")
+   plt.xlabel("Tipo de Corte")
+   plt.ylabel("Table (%)")
+   plt.legend()
+   plt.grid(axis='y', linestyle='--', alpha=0.7)
+   plt.show()
+   ```
+
+---
+
+### 3. **Scatterplot entre `table` y `price`**
+   - Explora cómo la variable `table` afecta el precio del diamante.
+   - Agrega un rango sombreado para el intervalo ideal.
+   ```python
+   plt.figure(figsize=(10, 6))
+   sns.scatterplot(data=df, x='table', y='price', hue='cut', palette='Set1', alpha=0.7)
+   plt.axvspan(53, 57, color='green', alpha=0.2, label='Rango Ideal (53%-57%)')
+   plt.title("Relación entre Table y Precio del Diamante")
+   plt.xlabel("Table (%)")
+   plt.ylabel("Precio (USD)")
+   plt.legend(title="Corte")
+   plt.grid(axis='y', linestyle='--', alpha=0.7)
+   plt.show()
+   ```
+
+---
+
+### 4. **Heatmap de densidad (table vs depth)**  
+   - Relaciona `table` con otra característica relevante como `depth` y evalúa densidades.
+   ```python
+   plt.figure(figsize=(10, 6))
+   sns.kdeplot(data=df, x='table', y='depth', cmap='viridis', fill=True)
+   plt.axvspan(53, 57, color='green', alpha=0.2, label='Rango Ideal (53%-57%)')
+   plt.title("Densidad conjunta de Table y Depth")
+   plt.xlabel("Table (%)")
+   plt.ylabel("Depth (%)")
+   plt.legend()
+   plt.show()
+   ```
+
+---
+
+### 5. **Violinplot para reflejar la distribución**
+   - Ideal para visualizar la densidad y distribución de `table` entre las categorías de corte.
+   ```python
+   plt.figure(figsize=(12, 6))
+   sns.violinplot(data=df, x='cut', y='table', palette='muted')
+   plt.axhspan(53, 57, color='green', alpha=0.2, label='Rango Ideal (53%-57%)')
+   plt.title("Distribución de Table por Tipo de Corte (Violin Plot)")
+   plt.xlabel("Tipo de Corte")
+   plt.ylabel("Table (%)")
+   plt.legend()
+   plt.grid(axis='y', linestyle='--', alpha=0.7)
+   plt.show()
+   ```
+
+---
+
+### 6. **Categorizar la variable `table` y comparar el impacto**
+   - Crear una columna categórica para clasificar los diamantes en **"Ideal"** (53%-57%) y **"No Ideal"**.
+   ```python
+   df['table_category'] = pd.cut(
+       df['table'], bins=[0, 53, 57, 100], labels=['Below Ideal', 'Ideal', 'Above Ideal']
+   )
+
+   plt.figure(figsize=(10, 6))
+   sns.countplot(data=df, x='table_category', palette='pastel')
+   plt.title("Frecuencia de Diamantes por Categoría de Table")
+   plt.xlabel("Categoría de Table")
+   plt.ylabel("Cantidad")
+   plt.grid(axis='y', linestyle='--', alpha=0.7)
+   plt.show()
+   ```
+
+---
+
+Estas visualizaciones te ayudarán a identificar cómo el parámetro **table** afecta el rendimiento óptico y otras características importantes del diamante.
+En el caso de la variable **`table`** (el ancho de la parte superior del diamante como porcentaje del ancho promedio), las correlaciones más útiles serían aquellas que exploran cómo **`table`** interactúa con otras propiedades del diamante y su posible impacto en factores como el precio o la calidad visual. Aquí tienes algunas sugerencias clave:
+
+---
+
+### 1. **Correlación entre `table` y `price`**
+   - **¿Por qué?**: Para evaluar si el tamaño relativo de la tabla afecta el precio. Esto puede reflejarse en cómo los compradores perciben la calidad visual y el rendimiento de la luz.
+   ```python
+   corr_table_price = df[['table', 'price']].corr().iloc[0, 1]
+   print(f"Correlación entre Table y Precio: {corr_table_price:.2f}")
+   ```
+
+---
+
+### 2. **Correlación entre `table` y `depth`**
+   - **¿Por qué?**: `table` y `depth` son medidas físicas interdependientes. Una tabla más grande puede estar asociada con una profundidad menor, lo que afecta el rendimiento óptico del diamante.
+   ```python
+   corr_table_depth = df[['table', 'depth']].corr().iloc[0, 1]
+   print(f"Correlación entre Table y Depth: {corr_table_depth:.2f}")
+   ```
+
+---
+
+### 3. **Correlación entre `table` y dimensiones físicas (`x`, `y`, `z`)**
+   - **¿Por qué?**: Estas dimensiones determinan el tamaño del diamante. Una tabla más grande puede estar vinculada a un ancho (`x` o `y`) mayor, pero no necesariamente a la altura (`z`).
+   ```python
+   correlations = df[['table', 'x', 'y', 'z']].corr()
+   print("Correlaciones entre Table y Dimensiones:")
+   print(correlations)
+   ```
+
+---
+
+### 4. **Correlación entre `table` y `carat`**
+   - **¿Por qué?**: El tamaño de la tabla puede influir en la percepción del peso del diamante. Los diamantes con tablas más grandes podrían parecer más pesados a pesar de ser más delgados.
+   ```python
+   corr_table_carat = df[['table', 'carat']].corr().iloc[0, 1]
+   print(f"Correlación entre Table y Carat: {corr_table_carat:.2f}")
+   ```
+
+---
+
+### 5. **Correlación entre `table` y variables categóricas (`cut`, `color`, `clarity`)**
+   - **¿Por qué?**: Para determinar si la tabla ideal está asociada con categorías de mayor calidad, como un mejor corte, mayor claridad o mejor color.
+   ```python
+   corr_cut = df.groupby('cut')['table'].mean()
+   corr_color = df.groupby('color')['table'].mean()
+   corr_clarity = df.groupby('clarity')['table'].mean()
+
+   print("Promedio de Table por Categorías:")
+   print("Cut:\n", corr_cut)
+   print("Color:\n", corr_color)
+   print("Clarity:\n", corr_clarity)
+   ```
+
+---
+
+### 6. **Relación entre `table` y reflectancia óptica simulada (si está disponible)**
+   - **¿Por qué?**: Si el dataset tiene datos relacionados con la reflexión de luz o brillo (como proporciones de luz reflejada), sería interesante analizar cómo `table` impacta el rendimiento visual.
+
+---
+
+### Representación gráfica de correlaciones:
+Puedes visualizar estas correlaciones en un heatmap para identificar rápidamente las relaciones más fuertes.
+
+```python
+plt.figure(figsize=(10, 8))
+sns.heatmap(df[['table', 'price', 'depth', 'x', 'y', 'z', 'carat']].corr(), annot=True, cmap='coolwarm')
+plt.title("Mapa de Calor de Correlaciones")
+plt.show()
+```
+
+Estas correlaciones te ayudarán a entender el impacto del tamaño de la tabla en las propiedades físicas, la calidad visual y el precio del diamante.
+
+TO DO 3:------------------------------------------------------------------
+## **price:
+Precio del diamante en dólares estadounidenses (USD). Impacto: Determinado por una combinación de peso (carat), calidad del corte (cut), color y claridad (clarity).
+TO DO combinar estos 3 parámetros y ver como cambia el precio
+
+El análisis del precio (`price`) en relación con los parámetros clave (`carat`, `cut`, `color` y `clarity`) es crucial para entender los factores que afectan el valor de un diamante. 
+
+---
+
+### **Relaciones interesantes con `price`**
+
+#### **1. Precio vs. Peso (`carat`)**
+   - **¿Por qué?**: El peso en quilates es uno de los principales determinantes del precio. El precio tiende a aumentar exponencialmente con el peso debido a la rareza de los diamantes más grandes.
+   - **Análisis esperado**: Relación no lineal (logarítmica o exponencial).
+   ```python
+   sns.scatterplot(data=df, x='carat', y='price', hue='cut', palette='cool', alpha=0.6)
+   plt.title("Relación entre Peso (Carat) y Precio por Corte")
+   plt.xlabel("Peso (Carat)")
+   plt.ylabel("Precio (USD)")
+   plt.show()
+   ```
+
+---
+
+#### **2. Precio vs. Calidad del Corte (`cut`)**
+   - **¿Por qué?**: Los cortes ideales o premium reflejan más luz, aumentando el atractivo visual del diamante, lo que suele elevar el precio.
+   - **Análisis esperado**: Precios más altos asociados con cortes "Ideal" y "Premium", precios más bajos con cortes "Fair".
+   ```python
+   sns.boxplot(data=df, x='cut', y='price', palette='pastel')
+   plt.title("Distribución de Precio por Calidad del Corte")
+   plt.xlabel("Calidad del Corte")
+   plt.ylabel("Precio (USD)")
+   plt.show()
+   ```
+
+---
+
+#### **3. Precio vs. Color**
+   - **¿Por qué?**: Los colores más cercanos al grado "D" (color más blanco) suelen ser más valiosos. Diamantes con colores hacia la gama "J" son más comunes y menos costosos.
+   - **Análisis esperado**: Relación inversa entre el grado de color y el precio.
+   ```python
+   sns.boxplot(data=df, x='color', y='price', palette='coolwarm')
+   plt.title("Distribución de Precio por Color")
+   plt.xlabel("Grado de Color")
+   plt.ylabel("Precio (USD)")
+   plt.show()
+   ```
+
+---
+
+#### **4. Precio vs. Claridad (`clarity`)**
+   - **¿Por qué?**: Los diamantes con menos inclusiones (grado más alto de claridad) suelen ser más costosos. Sin embargo, esto puede ser menos determinante que el corte o el peso.
+   - **Análisis esperado**: Relación directa; mayores precios con claridad alta como "FL" (Flawless) y precios más bajos con claridad "I1" (Incluido).
+   ```python
+   sns.boxplot(data=df, x='clarity', y='price', palette='viridis')
+   plt.title("Distribución de Precio por Claridad")
+   plt.xlabel("Grado de Claridad")
+   plt.ylabel("Precio (USD)")
+   plt.show()
+   ```
+
+---
+
+#### **5. Precio combinado con múltiples factores**
+   - **¿Por qué?**: El precio depende de una interacción entre `carat`, `cut`, `color` y `clarity`. Analizar estas interacciones permite identificar patrones más complejos.
+   - **Análisis esperado**: Los diamantes con peso alto, claridad perfecta, corte premium y color cercano a "D" deben estar en la parte más alta del rango de precios.
+
+   ##### a) **Relación entre `price`, `carat` y `cut`**
+   ```python
+   sns.scatterplot(data=df, x='carat', y='price', hue='cut', size='carat', palette='cool', alpha=0.6)
+   plt.title("Relación entre Peso (Carat), Precio y Corte")
+   plt.xlabel("Peso (Carat)")
+   plt.ylabel("Precio (USD)")
+   plt.show()
+   ```
+
+   ##### b) **Relación entre `price`, `color` y `clarity`**
+   ```python
+   sns.catplot(data=df, x='color', y='price', hue='clarity', kind='box', height=6, aspect=2, palette='viridis')
+   plt.title("Precio por Color y Claridad")
+   plt.xlabel("Grado de Color")
+   plt.ylabel("Precio (USD)")
+   plt.show()
+   ```
+
+---
+
+### **Análisis detallado**
+#### Combinar `carat`, `cut`, `color`, y `clarity` para agrupar precios
+
+   ##### a) Agrupación y resumen de precios
+   ```python
+   grouped = df.groupby(['cut', 'color', 'clarity']).agg({
+       'price': ['mean', 'max', 'min'],
+       'carat': ['mean', 'max', 'min']
+   }).reset_index()
+   grouped.columns = [
+       'cut', 'color', 'clarity', 
+       'price_mean', 'price_max', 'price_min', 
+       'carat_mean', 'carat_max', 'carat_min'
+   ]
+   print(grouped)
+   ```
+
+   ##### b) Heatmap para mostrar promedios
+   ```python
+   pivot_price = grouped.pivot('cut', 'color', 'price_mean')
+   sns.heatmap(pivot_price, annot=True, cmap='coolwarm', fmt='.1f')
+   plt.title("Precio Promedio por Corte y Color")
+   plt.xlabel("Grado de Color")
+   plt.ylabel("Corte")
+   plt.show()
+   ```
+
+---
+
+### **Conclusiones posibles**
+1. Diamantes con **peso alto**, **claridad perfecta**, y **cortes premium** se encuentran entre los más costosos.
+2. Los diamantes con colores hacia "J" o claridad baja tienen un precio más reducido, incluso con cortes ideales.
+3. El peso (`carat`) tiene una relación casi exponencial con el precio, siendo el factor más influyente.
+4. Las combinaciones de cortes "Ideal" o "Premium", con colores "D" o "E" y claridades "IF" o "VVS1", representan la cúspide en calidad y precio.
+
+TO DO 4:---------------------------------------------------------------------
+## color:
+El color del diamante, clasificado desde D (mejor, incoloro) hasta J (peor, amarillo tenue).
+Categorías:
+D (Mejor, incoloro),
+E, F, G, H, I, J (Peor, más amarillo tenue).
+Impacto: Los diamantes más incoloros (D-F) son más valiosos. Los colores más bajos (H-J) tienen tonos amarillentos. TO DO VERLOS EN FIGURAS
+  
+
+Para analizar el impacto del **color** de los diamantes y visualizar su relación con otras características importantes, puedes generar una serie de figuras que destacan cómo cambia el precio, la claridad y otros factores en función del grado de color.
+
+---
+
+### **Relaciones y Visualizaciones para `color`**
+
+#### **1. Precio (`price`) vs. Color**
+   - **¿Por qué?**: Los diamantes con grados de color más bajos (cercanos a "D") son más valiosos.
+   - **Figura**: Usar un boxplot para mostrar cómo cambia el precio según el color.
+   ```python
+   plt.figure(figsize=(10, 6))
+   sns.boxplot(data=df, x='color', y='price', palette='coolwarm')
+   plt.title("Distribución de Precios por Color")
+   plt.xlabel("Color (D: Mejor, J: Peor)")
+   plt.ylabel("Precio (USD)")
+   plt.grid(axis='y', linestyle='--', alpha=0.7)
+   plt.show()
+   ```
+
+---
+
+#### **2. Claridad (`clarity`) vs. Color**
+   - **¿Por qué?**: Explorar si los colores más altos (D-F) tienden a tener claridad más perfecta.
+   - **Figura**: Usar un countplot para mostrar la frecuencia de cada combinación de color y claridad.
+   ```python
+   plt.figure(figsize=(12, 6))
+   sns.countplot(data=df, x='color', hue='clarity', palette='viridis')
+   plt.title("Frecuencia de Claridad por Color")
+   plt.xlabel("Color")
+   plt.ylabel("Frecuencia")
+   plt.legend(title="Claridad")
+   plt.grid(axis='y', linestyle='--', alpha=0.7)
+   plt.show()
+   ```
+
+---
+
+#### **3. Peso (`carat`) vs. Color**
+   - **¿Por qué?**: Ver si los diamantes más grandes (peso alto) tienden a tener colores más bajos debido a su rareza.
+   - **Figura**: Usar un scatterplot con el tamaño proporcional al peso.
+   ```python
+   plt.figure(figsize=(10, 6))
+   sns.scatterplot(data=df, x='color', y='carat', hue='color', size='carat', palette='cool', alpha=0.7)
+   plt.title("Relación entre Peso y Color")
+   plt.xlabel("Color")
+   plt.ylabel("Peso (Carat)")
+   plt.grid(axis='y', linestyle='--', alpha=0.7)
+   plt.show()
+   ```
+
+---
+
+#### **4. Color vs. Precio por Claridad (`clarity`)**
+   - **¿Por qué?**: Explorar cómo se combinan el color y la claridad para influir en el precio.
+   - **Figura**: Un boxplot para comparar el precio en función del color y la claridad.
+   ```python
+   plt.figure(figsize=(12, 6))
+   sns.boxplot(data=df, x='color', y='price', hue='clarity', palette='viridis')
+   plt.title("Precio por Color y Claridad")
+   plt.xlabel("Color")
+   plt.ylabel("Precio (USD)")
+   plt.legend(title="Claridad", loc="upper left")
+   plt.grid(axis='y', linestyle='--', alpha=0.7)
+   plt.show()
+   ```
+
+---
+
+#### **5. Heatmap: Precio Promedio por Color y Claridad**
+   - **¿Por qué?**: Identificar patrones en los precios promedio según estas dos características.
+   - **Figura**: Crear un heatmap de precio promedio agrupado por `color` y `clarity`.
+   ```python
+   grouped = df.groupby(['color', 'clarity'])['price'].mean().reset_index()
+   pivot_price = grouped.pivot('color', 'clarity', 'price')
+   plt.figure(figsize=(12, 8))
+   sns.heatmap(pivot_price, annot=True, fmt=".0f", cmap='coolwarm', cbar_kws={'label': 'Precio Promedio (USD)'})
+   plt.title("Precio Promedio por Color y Claridad")
+   plt.xlabel("Claridad")
+   plt.ylabel("Color")
+   plt.show()
+   ```
+
+---
+
+### **Conclusiones esperadas**
+1. **Precios Altos para Colores D-F**: Los diamantes incoloros (cercanos a "D") tienen un precio promedio significativamente más alto.
+2. **Frecuencia de Colores**: Los grados de color intermedios como "G" y "H" podrían ser más comunes en combinaciones con claridad baja o media.
+3. **Relación Peso-Color**: Diamantes de peso mayor a menudo tienen colores más bajos debido a su rareza.
+4. **Combinación Clarity-Color-Precio**: Los diamantes con colores incoloros (D-F) y claridad alta (VVS1 o IF) dominan el rango más alto de precios.
+
+¿Te interesa ver alguna visualización en específico generada?
+
+TO DO 5:-------------------------------------------------------------------------------  
+## Relación entre Peso y Precio:
+
+El precio aumenta exponencialmente con el peso (carat), especialmente para pesos superiores a 1 quilate. TO DO comprobarlo
+
+¿Cómo se distribuyen los precios para diferentes combinaciones de claridad y color?
+
+Para analizar la relación entre **peso (carat)** y **precio**, especialmente para pesos superiores a 1 quilate, y explorar cómo se distribuyen los precios para diferentes combinaciones de **claridad** y **color**, estas son las visualizaciones sugeridas:
+
+---
+
+### **1. Peso (`carat`) vs Precio (`price`)**
+
+#### a) **Scatterplot con escala logarítmica**
+- **¿Por qué?**: El precio aumenta exponencialmente con el peso, y una escala logarítmica puede ayudar a identificar patrones.
+- **Figura**:
+```python
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=df, x='carat', y='price', hue='carat', size='carat', alpha=0.7, palette='viridis')
+plt.yscale('log')  # Escala logarítmica para el precio
+plt.title("Relación entre Peso y Precio (Escala Logarítmica)")
+plt.xlabel("Peso (Carat)")
+plt.ylabel("Precio (USD, Log Scale)")
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.legend(title="Peso (Carat)")
+plt.show()
+```
+
+---
+
+#### b) **Relación promedio por intervalo de peso**
+- **¿Por qué?**: Agrupar por rangos de peso permite una visualización más clara de la tendencia promedio.
+- **Figura**:
+```python
+# Crear intervalos para agrupar pesos
+df['carat_range'] = pd.cut(df['carat'], bins=[0, 0.5, 1, 1.5, 2, 2.5, 3, 5], right=False)
+
+# Calcular el precio promedio por rango de peso
+grouped = df.groupby('carat_range')['price'].mean().reset_index()
+
+plt.figure(figsize=(12, 6))
+sns.barplot(data=grouped, x='carat_range', y='price', palette='coolwarm')
+plt.title("Precio Promedio por Intervalo de Peso")
+plt.xlabel("Intervalo de Peso (Carat)")
+plt.ylabel("Precio Promedio (USD)")
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.xticks(rotation=45)
+plt.show()
+```
+
+---
+
+### **2. Precio por Combinaciones de Claridad y Color**
+
+#### a) **Boxplot por Claridad y Color**
+- **¿Por qué?**: Explorar cómo se distribuyen los precios según las combinaciones de claridad y color.
+- **Figura**:
+```python
+plt.figure(figsize=(14, 8))
+sns.boxplot(data=df, x='color', y='price', hue='clarity', palette='viridis')
+plt.title("Distribución de Precios por Color y Claridad")
+plt.xlabel("Color")
+plt.ylabel("Precio (USD)")
+plt.legend(title="Claridad", bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+```
+
+---
+
+#### b) **Heatmap del Precio Promedio por Color y Claridad**
+- **¿Por qué?**: Identificar patrones en los precios promedio.
+- **Figura**:
+```python
+grouped = df.groupby(['color', 'clarity'])['price'].mean().reset_index()
+pivot_price = grouped.pivot('color', 'clarity', 'price')
+
+plt.figure(figsize=(12, 8))
+sns.heatmap(pivot_price, annot=True, fmt=".0f", cmap='coolwarm', cbar_kws={'label': 'Precio Promedio (USD)'})
+plt.title("Precio Promedio por Color y Claridad")
+plt.xlabel("Claridad")
+plt.ylabel("Color")
+plt.show()
+```
+
+---
+
+### **3. Peso, Precio y Categorías de Precio**
+
+#### a) **Scatterplot con Categorías de Precio**
+- **¿Por qué?**: Visualizar cómo las categorías de precio interactúan con peso y precio.
+- **Figura**:
+```python
+plt.figure(figsize=(12, 6))
+sns.scatterplot(data=df, x='carat', y='price', hue='price_category_my', style='clarity', palette='Set2', alpha=0.8)
+plt.title("Peso vs. Precio por Categoría y Claridad")
+plt.xlabel("Peso (Carat)")
+plt.ylabel("Precio (USD)")
+plt.legend(title="Categoría de Precio", bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+```
+
+---
+
+### **Conclusiones esperadas:**
+1. **Relación Peso-Precio**: Confirmarás el aumento exponencial del precio a medida que el peso supera los 1 quilate.
+2. **Impacto del Color y Claridad**: Los colores más bajos (D-F) y claridad alta (IF o VVS1) tenderán a ser más costosos.
+3. **Rangos de Peso**: Los diamantes más pequeños (<0.5 quilates) muestran precios relativamente uniformes, mientras que los diamantes grandes (2-3 quilates) tendrán variaciones significativas.
+4. **Categorías de Precio**: Las categorías de precio mostrarán cómo las interacciones entre peso y claridad determinan los costos.
+
+¿Te interesa generar alguna de estas figuras?
+
+TO DO 6:-------------------------------------------------------------------------------
+columna para el volumen (x * y * z) y analizar su relación con el precio. TO DO
+
+Para calcular el **volumen** de los diamantes y analizar su relación con el precio, podemos proceder de la siguiente manera:
+
+---
+
+### **1. Crear la columna para el volumen**
+El volumen se calcula como:
+
+\[
+\text{volumen} = x \cdot y \cdot z
+\]
+
+### **Código para calcular el volumen:**
+```python
+# Calcular el volumen del diamante
+df['volume'] = df['x'] * df['y'] * df['z']
+print("Columna 'volume' creada.")
+print(df[['x', 'y', 'z', 'volume']].head())
+```
+
+**Nota:** Si hay valores nulos o valores cero en `x`, `y` o `z`, asegúrate de tratarlos antes de realizar este cálculo.
+
+---
+
+### **2. Relación entre Volumen y Precio**
+Visualizaciones sugeridas para explorar la relación:
+
+#### a) **Scatterplot (Precio vs Volumen)**
+```python
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=df, x='volume', y='price', hue='carat', palette='viridis', alpha=0.7)
+plt.title("Relación entre Volumen y Precio")
+plt.xlabel("Volumen (mm³)")
+plt.ylabel("Precio (USD)")
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.colorbar(label="Peso (Carat)")
+plt.show()
+```
+
+---
+
+#### b) **Regresión entre Precio y Volumen**
+Ajustar una línea de regresión para observar la tendencia.
+
+```python
+plt.figure(figsize=(10, 6))
+sns.regplot(data=df, x='volume', y='price', scatter_kws={'alpha':0.6}, line_kws={'color':'red'})
+plt.title("Relación entre Volumen y Precio con Línea de Regresión")
+plt.xlabel("Volumen (mm³)")
+plt.ylabel("Precio (USD)")
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+```
+
+---
+
+#### c) **Boxplot por Rangos de Volumen**
+Dividir el volumen en rangos para analizar cómo se distribuyen los precios dentro de cada rango.
+
+```python
+# Crear rangos de volumen
+df['volume_range'] = pd.cut(df['volume'], bins=[0, 50, 150, 300, 600, 1000, 2000], right=False)
+
+plt.figure(figsize=(12, 6))
+sns.boxplot(data=df, x='volume_range', y='price', palette='coolwarm')
+plt.title("Distribución de Precios por Rangos de Volumen")
+plt.xlabel("Rangos de Volumen (mm³)")
+plt.ylabel("Precio (USD)")
+plt.xticks(rotation=45)
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+```
+
+---
+
+#### d) **Heatmap (Volumen y Precio Medio por Color y Claridad)**
+Explorar cómo el volumen afecta el precio medio al combinarlo con otras categorías.
+
+```python
+# Agrupar por color, claridad y calcular el volumen promedio
+grouped = df.groupby(['color', 'clarity'])['volume', 'price'].mean().reset_index()
+
+# Crear un heatmap con el precio medio
+pivot_price = grouped.pivot('color', 'clarity', 'price')
+
+plt.figure(figsize=(12, 8))
+sns.heatmap(pivot_price, annot=True, fmt=".0f", cmap='coolwarm', cbar_kws={'label': 'Precio Promedio (USD)'})
+plt.title("Precio Promedio por Color y Claridad")
+plt.xlabel("Claridad")
+plt.ylabel("Color")
+plt.show()
+```
+
+---
+
+### **Conclusiones esperadas:**
+1. **Volumen y Precio**:
+   - El precio tiende a aumentar con el volumen, aunque pueden observarse ciertos outliers.
+   - Para volúmenes pequeños (bajo 50 mm³), los precios tienden a ser más uniformes.
+
+2. **Regresión Volumen-Precio**:
+   - Podrás confirmar si existe una relación lineal o no lineal entre ambas variables.
+
+3. **Rangos de Volumen**:
+   - Las categorías más altas de precio podrían asociarse con volúmenes en un rango intermedio, ya que un volumen muy alto no siempre implica un diamante más valioso.
+
+4. **Categorías por Color y Claridad**:
+   - Identificarás qué combinaciones de color y claridad están asociadas con los volúmenes más altos y cómo esto influye en el precio promedio.
+
+¿Te interesa implementar alguna de estas figuras? 😊
+
+TO DO 7:--------------------------------------------------------------------------------
+Calcular las correlaciones entre variables numéricas, como carat, price, y depth. TO DO comprobar que se ha hecho
+
+### Calcular Correlaciones entre Variables Numéricas
+
+Para calcular y visualizar las correlaciones entre las variables numéricas, como `carat`, `price`, y `depth`, podemos usar los siguientes pasos:
+
+---
+
+### **1. Seleccionar las columnas numéricas relevantes**
+Filtraremos las columnas numéricas del DataFrame para enfocarnos en las variables importantes.
+
+```python
+# Seleccionar las columnas numéricas relevantes
+numeric_columns = ['carat', 'price', 'depth', 'table', 'x', 'y', 'z', 'volume']
+print(f"Columnas numéricas seleccionadas: {numeric_columns}")
+
+# Subconjunto del DataFrame con las columnas seleccionadas
+df_numeric = df[numeric_columns]
+```
+
+---
+
+### **2. Calcular la Matriz de Correlación**
+Usaremos `.corr()` para calcular las correlaciones entre las variables numéricas.
+
+```python
+# Calcular la matriz de correlación
+correlation_matrix = df_numeric.corr()
+print("Matriz de correlación:")
+print(correlation_matrix)
+```
+
+---
+
+### **3. Visualizar la Matriz de Correlación**
+#### a) **Heatmap de Correlaciones**
+Para visualizar las correlaciones de forma clara y visual, podemos usar `sns.heatmap`.
+
+```python
+plt.figure(figsize=(10, 8))
+sns.heatmap(
+    correlation_matrix, 
+    annot=True, 
+    fmt=".2f", 
+    cmap="coolwarm", 
+    linewidths=0.5, 
+    cbar_kws={"label": "Correlación"}
+)
+plt.title("Matriz de Correlación entre Variables Numéricas")
+plt.show()
+```
+
+---
+
+### **4. Identificar Correlaciones Altas**
+Podemos identificar rápidamente pares de variables con correlaciones altas o bajas.
+
+```python
+# Desenrollar la matriz para obtener pares de correlaciones
+correlation_pairs = correlation_matrix.unstack()
+
+# Filtrar por correlaciones altas
+high_correlations = correlation_pairs[(correlation_pairs > 0.5) & (correlation_pairs < 1)]
+print("Pares de variables con correlación alta (> 0.5):")
+print(high_correlations)
+```
+
+---
+
+### **Resultados Esperados**
+1. **Correlación `carat` vs `price`**:
+   - Se espera que haya una alta correlación positiva, ya que el peso (`carat`) influye significativamente en el precio.
+   
+2. **Correlación `depth` vs `price`**:
+   - La correlación puede ser más débil o incluso negativa, dependiendo de cómo influye la profundidad en el precio.
+
+3. **Correlación entre `x`, `y`, `z`, y `volume`**:
+   - Se espera una alta correlación entre estas dimensiones físicas y el volumen, ya que el volumen es una función directa de `x * y * z`.
+
+4. **Visualización**:
+   - El heatmap destacará las correlaciones más altas en tonos cálidos (rojo) y las más bajas en tonos fríos (azul).
+
+¿Te interesa implementar alguna parte de este análisis o ajustarlo a tus necesidades? 😊
+
+TO DO 8:--------------------------------------------------------------------------------
+## Análisis de Valores Atípicos:
+
+Identificar diamantes cuyo precio o dimensiones se desvían significativamente. TO DO dar la fila completa de estos diamantes
+
+### **Análisis de Valores Atípicos en el DataFrame**
+
+Para identificar diamantes con valores atípicos en su precio o dimensiones, podemos seguir estos pasos:
+
+---
+
+### **1. Definir los límites para valores atípicos usando el método de Tukey**
+
+El método de Tukey define límites basados en el rango intercuartílico (IQR):
+
+- **Límite inferior**: \( Q1 - 1.5 \cdot \text{IQR} \)
+- **Límite superior**: \( Q3 + 1.5 \cdot \text{IQR} \)
+
+```python
+def identificar_outliers(df, column):
+    """
+    Identifica valores atípicos en una columna utilizando el método de Tukey.
+    
+    Parámetros:
+    - df: DataFrame
+    - column: Nombre de la columna a analizar
+    
+    Retorna:
+    - DataFrame con filas que contienen valores atípicos en la columna seleccionada.
+    """
+    Q1 = df[column].quantile(0.25)
+    Q3 = df[column].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_limit = Q1 - 1.5 * IQR
+    upper_limit = Q3 + 1.5 * IQR
+    
+    print(f"Columna: {column}")
+    print(f"Q1: {Q1}, Q3: {Q3}, IQR: {IQR}")
+    print(f"Límite inferior: {lower_limit}, Límite superior: {upper_limit}")
+    
+    # Identificar outliers
+    outliers = df[(df[column] < lower_limit) | (df[column] > upper_limit)]
+    return outliers
+
+# Identificar outliers en las columnas relevantes
+columns_to_check = ['price', 'x', 'y', 'z', 'carat', 'depth', 'table', 'volume']
+outliers = pd.DataFrame()
+
+for column in columns_to_check:
+    column_outliers = identificar_outliers(df, column)
+    if not column_outliers.empty:
+        print(f"Valores atípicos detectados en la columna '{column}': {len(column_outliers)}")
+        outliers = pd.concat([outliers, column_outliers])
+```
+
+---
+
+### **2. Mostrar los valores atípicos detectados**
+
+Mostrar todas las filas con valores atípicos detectados en cualquiera de las columnas analizadas.
+
+```python
+# Eliminar duplicados en caso de que la misma fila sea un outlier en múltiples columnas
+outliers = outliers.drop_duplicates()
+
+print(f"Total de valores atípicos detectados: {len(outliers)}")
+print("Filas con valores atípicos:")
+display(outliers)
+```
+
+---
+
+### **3. Resultados Esperados**
+1. **Valores Atípicos en Precio (`price`)**:
+   - Los diamantes con precios significativamente más altos o más bajos que el rango esperado serán detectados.
+
+2. **Valores Atípicos en Dimensiones (`x`, `y`, `z`)**:
+   - Diamantes con dimensiones extremadamente pequeñas o grandes serán marcados como valores atípicos.
+
+3. **Volumen (`volume`)**:
+   - El volumen derivado de \( x \cdot y \cdot z \) también será analizado.
+
+---
+
+### **4. Gráficos Opcionales**
+Podemos visualizar los valores atípicos con un **boxplot** para cada columna.
+
+```python
+for column in columns_to_check:
+    plt.figure(figsize=(8, 5))
+    sns.boxplot(data=df, y=column, color='skyblue')
+    plt.title(f"Distribución y Valores Atípicos en {column}")
+    plt.ylabel(column.capitalize())
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+```
+
+¿Quieres implementar algún ajuste o realizar el análisis con un conjunto de columnas específico? 😊
+
+
+TO DO 9:-----------------------------------------------------------------------------------
+### TO DO
+poner la moda no de la columna completa, sino de la categoria mas cercana a la que queremos cambiar
+
+Para reemplazar valores faltantes o atípicos con la **moda** de la categoría más cercana (basada en una o más columnas categóricas), podemos seguir este enfoque:
+
+### **Código para Reemplazar con Moda de Categoría Más Cercana**
+
+```python
+def rellenar_con_moda_por_categoria(df, target_column, category_columns):
+    """
+    Rellena valores NaN o valores inválidos en la columna objetivo con la moda
+    de la categoría más cercana (basada en una combinación de columnas categóricas).
+    
+    Parámetros:
+    - df: DataFrame
+    - target_column: Columna que contiene valores faltantes o atípicos
+    - category_columns: Columnas categóricas para agrupar y calcular la moda
+    
+    Retorna:
+    - DataFrame modificado
+    """
+    # Identificar valores NaN o inválidos en la columna objetivo
+    invalid_rows = df[target_column].isna() | (df[target_column] == 0)
+    print(f"Filas con valores inválidos en '{target_column}': {invalid_rows.sum()}")
+    
+    # Agrupar por las columnas categóricas y calcular la moda
+    moda_por_categoria = df.groupby(category_columns)[target_column].agg(lambda x: x.mode()[0] if not x.mode().empty else None)
+    
+    # Reemplazar valores inválidos con la moda correspondiente
+    for idx, row in df[invalid_rows].iterrows():
+        # Obtener la clave de agrupación para la fila actual
+        group_key = tuple(row[category_columns])
+        if group_key in moda_por_categoria.index:
+            moda = moda_por_categoria[group_key]
+            if pd.notna(moda):
+                df.at[idx, target_column] = moda
+                print(f"Reemplazando fila {idx} con moda: {moda}")
+    
+    return df
+
+# Ejemplo de uso
+df = rellenar_con_moda_por_categoria(
+    df, 
+    target_column='z',  # Columna con valores inválidos
+    category_columns=['cut', 'color', 'clarity']  # Columnas categóricas para agrupar
+)
+```
+
+---
+
+### **Detalles del Código**
+1. **Identificación de Valores Inválidos**:
+   - Los valores `NaN` o `0` en la columna objetivo (`target_column`) son identificados como inválidos.
+
+2. **Cálculo de Moda por Categoría**:
+   - Se utiliza `groupby` sobre las columnas categóricas (`category_columns`) y se calcula la moda para cada grupo.
+
+3. **Asignación de la Moda**:
+   - Para cada fila con valor inválido, se busca la moda del grupo correspondiente y se reemplaza el valor.
+
+4. **Manejo de Grupos sin Moda**:
+   - Si un grupo no tiene valores válidos para calcular la moda, se ignora.
+
+---
+
+### **Visualización de Resultados**
+Después de realizar el reemplazo, puedes verificar los cambios:
+
+```python
+# Verificar si aún hay valores inválidos
+print(f"Valores inválidos restantes en 'z': {df['z'].isna().sum() + (df['z'] == 0).sum()}")
+```
+
+¿Te gustaría ajustar algo o aplicar esto a un conjunto específico de columnas? 😊
+
+TO DO 10:-----------------------------------------------------------------------------------
+### TO DO
+????? Tenemos que guardar alguno de los encoding???
+De momento se guarda cut_int
+
+### ¿Deberíamos guardar algún **encoding**? 
+
+Guardar un **encoding** depende del flujo de trabajo y del propósito de los datos. Aquí tienes algunos puntos a considerar:
+
+---
+
+### **Razones para Guardar un Encoding**
+1. **Consistencia**:
+   - Si más adelante trabajas con nuevas instancias de datos (por ejemplo, otros diamantes), el encoding debe ser consistente para evitar errores en análisis o predicciones.
+   - Ejemplo: Si `cut` fue convertido a `cut_int`, las nuevas instancias de `cut` deben mapearse al mismo encoding.
+
+2. **Modelos de Machine Learning**:
+   - Los modelos generalmente necesitan datos numéricos. Guardar encodings asegura que puedas reutilizarlos para preprocesar datos nuevos antes de hacer predicciones.
+
+3. **Documentación**:
+   - Si los encodings son parte de un pipeline reproducible, guardarlos ayuda a que otros usuarios (o tú mismo en el futuro) entiendan cómo se transformaron los datos.
+
+4. **Reutilización en Análisis**:
+   - Si necesitas regenerar gráficos o ejecutar modelos con datos en formatos específicos, guardar los encodings es útil para no repetir cálculos.
+
+---
+
+### **Formas de Guardar Encodings**
+1. **Archivo de Texto o JSON**:
+   - Ejemplo: Guardar un diccionario de mapeo en un archivo JSON.
+   ```python
+   import json
+   
+   encoding_cut = {'Fair': 1, 'Good': 2, 'Very Good': 3, 'Premium': 4, 'Ideal': 5}
+   with open('cut_encoding.json', 'w') as f:
+       json.dump(encoding_cut, f)
+   ```
+
+2. **En el Mismo DataFrame**:
+   - Mantén columnas tanto categóricas como sus versiones codificadas (`cut` y `cut_int`), para mayor flexibilidad.
+
+3. **Archivo CSV**:
+   - Guarda el DataFrame entero con las columnas codificadas.
+   ```python
+   df.to_csv('diamonds_encoded.csv', index=False)
+   ```
+
+---
+
+### **¿Qué Encodings Podrían Guardarse?**
+1. `cut_int`: Ya mencionado, útil para modelos y análisis.
+2. **One-Hot Encoding**:
+   - Si usas un análisis que depende de variables binarias (como modelos lineales), guardar los encodings puede ser clave.
+3. **Mappings Personalizados**:
+   - Si ajustaste un encoding ordinal para columnas como `color` o `clarity`, guarda esos mappings.
+
+---
+
+### **Implementación**
+Podríamos guardar cualquier encoding relevante como parte de un pipeline. Por ejemplo:
+
+```python
+# Generar un encoding ordinal para claridad
+clarity_encoding = {val: idx for idx, val in enumerate(df['clarity'].unique(), start=1)}
+
+# Aplicar el encoding al DataFrame
+df['clarity_int'] = df['clarity'].map(clarity_encoding)
+
+# Guardar los encodings
+encodings = {
+    'cut': {'Fair': 1, 'Good': 2, 'Very Good': 3, 'Premium': 4, 'Ideal': 5},
+    'clarity': clarity_encoding
+}
+
+# Guardar encodings en un archivo JSON
+import json
+with open('encodings.json', 'w') as f:
+    json.dump(encodings, f)
+```
+
+---
+
+### **¿Deberíamos Guardar Otros Encodings?**
+Si planeas hacer análisis adicionales, ajustar modelos, o documentar pasos clave del pipeline, **sí deberías guardar los encodings** que son críticos para reproducir los resultados. 😊
+
+
+TO DO 12:-----------------------------------------------------------------------------------
+1. **Los precios de los diamantes están fuertemente sesgados hacia la derecha.** YA ESTA HECHO
+
+TO DO 13:-----------------------------------------------------------------------------------
+'''# Transformaciones Alternativas:  la raíz cuadrada o el inverso:
+sqrt_transformation = np.sqrt(valores_positivos)
+inv_transformation = 1 / valores_positivos'''  TO DO
+
+Para implementar las transformaciones alternativas **raíz cuadrada** y **inverso**, puedes seguir estos pasos para analizar cómo afectan la distribución de los precios u otras variables. Estas transformaciones se utilizan comúnmente para manejar sesgos o escalas grandes en los datos.
+
+### Código para realizar las transformaciones y visualizar resultados
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Filtrar valores positivos (necesario para estas transformaciones)
+valores_positivos = df['price'][df['price'] > 0]
+
+# Transformación raíz cuadrada
+sqrt_transformation = np.sqrt(valores_positivos)
+
+# Transformación inversa
+inv_transformation = 1 / valores_positivos
+
+# Configurar subplots
+fig, axes = plt.subplots(1, 3, figsize=(18, 6), constrained_layout=True)
+
+# Gráfico original
+sns.histplot(valores_positivos, bins=50, kde=True, ax=axes[0], color='blue', alpha=0.6)
+axes[0].set_title("Distribución Original (Precio)", fontsize=14)
+axes[0].set_xlabel("Precio (USD)", fontsize=12)
+axes[0].set_ylabel("Frecuencia", fontsize=12)
+
+# Gráfico raíz cuadrada
+sns.histplot(sqrt_transformation, bins=50, kde=True, ax=axes[1], color='green', alpha=0.6)
+axes[1].set_title("Transformación Raíz Cuadrada", fontsize=14)
+axes[1].set_xlabel("Raíz Cuadrada del Precio", fontsize=12)
+axes[1].set_ylabel("Frecuencia", fontsize=12)
+
+# Gráfico inverso
+sns.histplot(inv_transformation, bins=50, kde=True, ax=axes[2], color='red', alpha=0.6)
+axes[2].set_title("Transformación Inversa", fontsize=14)
+axes[2].set_xlabel("Inverso del Precio", fontsize=12)
+axes[2].set_ylabel("Frecuencia", fontsize=12)
+
+# Mostrar los gráficos
+plt.suptitle("Efecto de las Transformaciones en la Distribución del Precio", fontsize=16, y=1.02)
+plt.show()
+```
+
+### Notas
+1. **Raíz Cuadrada**:
+   - Suaviza los valores más grandes al reducir su escala de manera no lineal.
+   - Ayuda a mitigar un sesgo fuerte hacia la derecha.
+
+2. **Inverso**:
+   - Invierte los valores, haciendo que los valores grandes sean pequeños y viceversa.
+   - Se utiliza menos frecuentemente porque puede ser difícil de interpretar en términos prácticos.
+
+### Análisis esperado
+1. Compara las distribuciones antes y después de las transformaciones para ver cuál es más adecuada para tus análisis.
+2. Si quieres aplicar alguna de estas transformaciones al conjunto de datos, asegúrate de documentar cómo se utilizarán para el análisis posterior.
+
+¿Te gustaría que integre estas transformaciones en otro análisis, como correlaciones o modelos predictivos? 😊
+
+### **Qué podemos esperar de estas transformaciones**
+1. **Reducción del sesgo**:
+   - Las transformaciones, especialmente la raíz cuadrada y el logaritmo (si ya lo usaste previamente), son efectivas para **reducir el sesgo hacia la derecha** en distribuciones con colas largas, como el precio de los diamantes.
+   - Esto hace que los datos sean más **simétricos**, facilitando el uso de técnicas estadísticas y modelos que asumen normalidad.
+
+2. **Atenuación de valores extremos**:
+   - La **raíz cuadrada** reduce la escala de los valores grandes de forma no lineal, haciendo que los datos sean más manejables.
+   - El **inverso** invierte y disminuye los valores más grandes, pero es menos intuitivo para interpretar relaciones lineales.
+
+3. **Impacto en modelos predictivos**:
+   - Si los datos originales no se ajustan bien a un modelo (por ejemplo, en regresión lineal), estas transformaciones pueden mejorar el ajuste al **reducir errores residuales**.
+   - Facilita la detección de patrones en gráficos como scatterplots y mejora métricas como el **MSE**.
+
+---
+
+### **Cómo saber si hemos mejorado la distribución**
+1. **Visualización de la distribución**:
+   - Compara los histogramas antes y después de la transformación.
+   - Busca una **reducción del sesgo** hacia la derecha y un aspecto más simétrico (similar a una campana de Gauss).
+
+2. **Medición del sesgo**:
+   - Calcula la **asimetría** (**skewness**) de la distribución:
+     ```python
+     from scipy.stats import skew
+     print("Asimetría original:", skew(df['price']))
+     print("Asimetría raíz cuadrada:", skew(sqrt_transformation))
+     print("Asimetría inversa:", skew(inv_transformation))
+     ```
+     Una asimetría más cercana a 0 indica una mejora en la distribución.
+
+3. **Medición de curtosis**:
+   - Calcula la **curtosis** para entender la concentración en la media:
+     ```python
+     from scipy.stats import kurtosis
+     print("Curtosis original:", kurtosis(df['price']))
+     print("Curtosis raíz cuadrada:", kurtosis(sqrt_transformation))
+     print("Curtosis inversa:", kurtosis(inv_transformation))
+     ```
+     Una curtosis más cercana a 0 indica menos colas extremas.
+
+4. **Adecuación a modelos**:
+   - Entrena modelos predictivos antes y después de la transformación. Si las métricas como el **R²** o **MSE** mejoran, la transformación ha sido útil.
+
+---
+
+### **¿Se debe hacer sin los outliers?**
+Sí, **recomendado**:
+1. **Evitar distorsión por valores extremos**:
+   - Los outliers tienen un impacto desproporcionado en las transformaciones, especialmente con el logaritmo, raíz cuadrada o inverso.
+   - Sin outliers, la transformación es más representativa del conjunto de datos general.
+
+2. **Procesamiento típico**:
+   - Primero detecta y elimina los **outliers** con métodos como los **límites de Tukey (IQR)** o desviaciones estándar.
+   - Luego aplica la transformación a los datos restantes.
+
+---
+
+### **Propuesta de flujo**
+1. Detectar y eliminar outliers:
+   ```python
+   q1, q3 = np.percentile(df['price'], [25, 75])
+   iqr = q3 - q1
+   lower_limit = q1 - 1.5 * iqr
+   upper_limit = q3 + 1.5 * iqr
+   df_sin_outliers = df[(df['price'] >= lower_limit) & (df['price'] <= upper_limit)]
+   ```
+2. Aplicar las transformaciones sobre `df_sin_outliers['price']`.
+3. Visualizar la nueva distribución y analizar:
+   - Histogramas y curvas KDE.
+   - Cálculo de **asimetría** y **curtosis**.
+4. Evaluar mejoras en modelos predictivos:
+   - Comparar métricas antes y después de las transformaciones.
+
+¿Te gustaría implementarlo en un análisis específico? 😊
+
+
+
+
+
+
+
+
+
+
+
+
+TO DO 14:-----------------------------------------------------------------------------------
+**Asimetría de la distribución**:
+   - Todas las distribuciones muestran una asimetría positiva, con colas largas hacia los precios altos, a pesar de haber quitado outliers (quizá debería aumentar el margen) TO DO.
+
+### **Sobre la asimetría positiva persistente**
+
+Es normal que las distribuciones como el precio de los diamantes mantengan una **asimetría positiva** incluso después de eliminar outliers. Esto ocurre porque los diamantes caros son naturalmente menos frecuentes que los baratos. Sin embargo, si la asimetría sigue siendo demasiado pronunciada, puedes considerar los siguientes ajustes:
+
+---
+
+### **1. ¿Aumentar el margen para quitar outliers?**
+
+- **Método actual (Tukey / IQR):**
+   Elimina valores fuera de `[Q1 - 1.5 * IQR, Q3 + 1.5 * IQR]`. 
+   Si aún hay asimetría, prueba con un margen más restrictivo, como `1.0 * IQR` o incluso más:
+   ```python
+   lower_limit = q1 - 1.0 * iqr  # Margen más restrictivo
+   upper_limit = q3 + 1.0 * iqr
+   df_sin_outliers = df[(df['price'] >= lower_limit) & (df['price'] <= upper_limit)]
+   ```
+
+- **Criterio de desviaciones estándar:**
+   Elimina precios que están más allá de, por ejemplo, 2 desviaciones estándar de la media:
+   ```python
+   mean = df['price'].mean()
+   std_dev = df['price'].std()
+   lower_limit = mean - 2 * std_dev
+   upper_limit = mean + 2 * std_dev
+   df_sin_outliers = df[(df['price'] >= lower_limit) & (df['price'] <= upper_limit)]
+   ```
+
+**Nota:** Si el negocio justifica que los diamantes extremadamente caros son importantes, podría no ser adecuado eliminar precios altos, ya que representan productos exclusivos.
+
+---
+
+### **2. ¿Aplicar transformaciones adicionales?**
+
+Si la asimetría sigue siendo alta, utiliza transformaciones no lineales más agresivas:
+- **Logaritmo natural**:
+   Reduce las colas largas.
+   ```python
+   df['log_price'] = np.log(df['price'])
+   ```
+- **Raíz cúbica**:
+   Menos agresivo que el logaritmo.
+   ```python
+   df['cube_root_price'] = np.cbrt(df['price'])
+   ```
+
+Luego, verifica la nueva asimetría:
+```python
+from scipy.stats import skew
+print("Asimetría original:", skew(df['price']))
+print("Asimetría logaritmo:", skew(df['log_price']))
+print("Asimetría raíz cúbica:", skew(df['cube_root_price']))
+```
+
+---
+
+### **3. Visualizar el efecto del margen y las transformaciones**
+Crea gráficos comparativos para entender el impacto:
+- **Antes y después de eliminar outliers:**
+   ```python
+   sns.histplot(df['price'], kde=True, label='Original', color='blue')
+   sns.histplot(df_sin_outliers['price'], kde=True, label='Sin Outliers', color='orange')
+   plt.axvline(lower_limit, color='red', linestyle='--', label='Límite Inferior')
+   plt.axvline(upper_limit, color='green', linestyle='--', label='Límite Superior')
+   plt.legend()
+   plt.show()
+   ```
+
+- **Antes y después de transformaciones:**
+   ```python
+   sns.histplot(df['price'], kde=True, label='Original', color='blue')
+   sns.histplot(df['log_price'], kde=True, label='Logaritmo', color='orange')
+   sns.histplot(df['cube_root_price'], kde=True, label='Raíz Cúbica', color='green')
+   plt.legend()
+   plt.show()
+   ```
+
+---
+
+### **4. Decidir según el contexto**
+La eliminación de outliers o transformaciones depende del propósito:
+- Si estás **analizando tendencias generales**, es válido excluir valores extremos.
+- Si buscas entender **el comportamiento en precios altos (lujo)**, mantén algunos valores altos.
+
+¿Te gustaría implementar ajustes más restrictivos o probar transformaciones adicionales?
+
+
+
+TO DO 15:-----------------------------------------------------------------------------------
+   - Sería interesante superponer el gráfico de boxplot  con una versión que incluya el precio por quilate para analizar cómo se distribuyen los precios en función de la calidad del corte. TO DO
+
+Para **superponer un gráfico de boxplot con una versión que incluya el precio por quilate**, podemos usar dos ejes en el mismo gráfico. Aquí tienes cómo implementarlo:
+
+### Código para superponer el análisis:
+```python
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Crear una nueva columna de precio por quilate
+df['price_per_carat'] = df['price'] / df['carat']
+
+# Configurar la figura
+plt.figure(figsize=(12, 6))
+
+# Crear un boxplot para el precio
+sns.boxplot(data=df, x='cut', y='price', palette='Set2', width=0.4, showfliers=False, zorder=1)
+plt.ylabel("Precio (USD)", fontsize=12)
+plt.title("Distribución de Precios y Precio por Quilate según la Calidad del Corte", fontsize=14)
+
+# Crear un segundo eje Y para el precio por quilate
+ax1 = plt.gca()  # Obtener el eje actual
+ax2 = ax1.twinx()  # Crear un eje gemelo que comparte el eje X
+
+# Crear un boxplot para el precio por quilate
+sns.boxplot(data=df, x='cut', y='price_per_carat', palette='cool', width=0.3, ax=ax2, showfliers=False, zorder=2)
+ax2.set_ylabel("Precio por Quilate (USD)", fontsize=12)
+
+# Añadir leyendas para diferenciar los gráficos
+custom_lines = [
+    plt.Line2D([0], [0], color='orange', lw=4, label='Precio por Quilate'),
+    plt.Line2D([0], [0], color='green', lw=4, label='Precio')
+]
+plt.legend(handles=custom_lines, loc='upper left', title="Leyenda")
+
+# Ajustar las etiquetas y los ejes
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+```
+
+---
+
+### **Explicación del Código**
+1. **Cálculo de precio por quilate**: Se añade una nueva columna `price_per_carat` para comparar el precio total con el precio por peso.
+2. **Superposición de ejes**:
+   - Se utiliza `twinx()` para añadir un segundo eje Y compartiendo el eje X.
+   - Esto permite comparar la distribución del precio y el precio por quilate en un mismo gráfico.
+3. **Configuración del gráfico**:
+   - Los boxplots se superponen con colores distintos para distinguir las métricas.
+   - Una leyenda personalizada aclara qué representa cada color.
+4. **Ejes separados**:
+   - El primer eje Y (`ax1`) muestra el precio.
+   - El segundo eje Y (`ax2`) muestra el precio por quilate.
+
+---
+
+¿Quieres ajustar algún detalle o incluir filtros en los datos para una mejor visualización?
+
+Tu plan está muy bien detallado y cubre los puntos principales para cada TO DO. Ahora haré un resumen y mejoras sugeridas para cada sección relevante:
+
+---
+
+### **TO DO 1: Análisis de `depth`**
+#### Mejora:
+- Incluye un rango ideal (58%-62%) al analizar `depth` en tus visualizaciones. Por ejemplo:
+  ```python
+  plt.axhspan(58, 62, color='green', alpha=0.2, label='Rango Ideal (58%-62%)')
+  ```
+- Considera un scatterplot entre `depth` y la proporción `z/(x+y)` para verificar la consistencia.
+
+---
+
+### **TO DO 2: Análisis de `table`**
+#### Mejora:
+- Para identificar tablas fuera del rango ideal (53%-57%), crea una columna categórica:
+  ```python
+  df['table_category'] = pd.cut(df['table'], bins=[0, 53, 57, 100], labels=['Below Ideal', 'Ideal', 'Above Ideal'])
+  ```
+- Luego, agrupa los datos por esta columna y visualiza tendencias:
+  ```python
+  sns.barplot(data=df, x='table_category', y='price', palette='pastel')
+  ```
+
+---
+
+### **TO DO 3: Relación de `price` con otros parámetros**
+#### Mejora:
+- Agrega gráficos interactivos como `plotly.express` para explorar combinaciones de `cut`, `color` y `clarity`.
+- Divide los datos en rangos de peso (`carat`) y analiza la relación con `price` dentro de cada rango.
+
+---
+
+### **TO DO 4: Impacto del `color`**
+#### Mejora:
+- Agrega una columna para categorizar colores como "Incoloro" (D-F) y "Amarillento" (G-J):
+  ```python
+  df['color_category'] = df['color'].apply(lambda x: 'Incoloro' if x in ['D', 'E', 'F'] else 'Amarillento')
+  ```
+- Crea un gráfico combinado que muestre precio y frecuencia por categoría de color.
+
+---
+
+### **TO DO 5: Relación Peso-Precio**
+#### Mejora:
+- Realiza una regresión no lineal entre `carat` y `price` para ajustarte a la tendencia exponencial. Por ejemplo:
+  ```python
+  import numpy as np
+  from sklearn.linear_model import LinearRegression
+  X = np.log(df['carat']).values.reshape(-1, 1)
+  y = np.log(df['price']).values.reshape(-1, 1)
+  model = LinearRegression().fit(X, y)
+  ```
+
+---
+
+### **TO DO 6: Relación Volumen-Precio**
+#### Mejora:
+- Identifica valores atípicos en el volumen (por ejemplo, volúmenes muy grandes pero precios bajos). 
+- Crea un rango ideal basado en estadísticas como el rango intercuartílico de `volume`.
+
+---
+
+### **TO DO 7: Correlaciones entre variables numéricas**
+#### Mejora:
+- Añade un análisis de correlación específica entre `price_per_carat` y variables como `depth` o `table`.
+
+---
+
+### **TO DO 8: Análisis de valores atípicos**
+#### Mejora:
+- Muestra outliers en gráficos de dispersión para facilitar su interpretación:
+  ```python
+  sns.scatterplot(data=df, x='carat', y='price', hue=(df['price'] > upper_limit), palette={True: 'red', False: 'blue'})
+  ```
+
+---
+
+### **TO DO 9: Rellenar con la moda más cercana**
+#### Mejora:
+- Si ninguna categoría tiene valores válidos, usa la media global como respaldo:
+  ```python
+  moda_global = df[target_column].mode()[0]
+  ```
+
+---
+
+### **TO DO 10: Guardar encodings**
+#### Mejora:
+- Guarda todos los encodings en un archivo JSON para uso futuro:
+  ```python
+  with open('encodings.json', 'w') as f:
+      json.dump({'cut_int': cut_encoding, 'color_int': color_encoding}, f)
+  ```
+
+---
+
+### **TO DO 11: DataFrame sin outliers**
+#### Mejora:
+- Crea una función que permita especificar columnas y criterios para eliminar outliers:
+  ```python
+  def remove_outliers(df, columns):
+      for column in columns:
+          ...
+      return df_sin_outliers
+  ```
+
+---
+
+### **TO DO 12: Precios sesgados**
+#### Mejora:
+- Prueba distribuciones teóricas para ajustar mejor los datos, como `log-normal` o `gamma`.
+
+---
+
+### **TO DO 13: Transformaciones alternativas**
+#### Mejora:
+- Añade una comparación visual entre los histogramas originales y transformados.
+
+---
+
+### **TO DO 14: Ajustar margen de outliers**
+#### Mejora:
+- Incluye límites dinámicos basados en percentiles ajustados:
+  ```python
+  lower_limit = np.percentile(df['price'], 1)
+  upper_limit = np.percentile(df['price'], 99)
+  ```
+
+---
+
+### **TO DO 15: Superposición de gráficos**
+#### Mejora:
+- Experimenta con subplots en lugar de ejes gemelos para una comparación más clara.
+
+---
+
+¿Hay algo más que quieras ajustar o desarrollar en este análisis? 😊
+
+Gracias por señalarlo. Voy a consolidar la información eliminando cualquier contenido repetido o redundante. Mantendré solo los puntos clave, organizados de forma clara y concisa. Aquí está la versión refinada:
+
+---
+
+### TO DO 1: Análisis de `depth`
+1. **Correlación entre `depth` y otras variables**:
+   - `price`, dimensiones (`x`, `y`, `z`), `table`, `carat`, `cut`, y categorías como `clarity` o `color`.
+   - Fórmula: 
+     \[
+     \text{depth} = \left(\frac{z}{\frac{x + y}{2}}\right) \times 100
+     \]
+2. **Gráficos sugeridos**:
+   - Boxplot de `depth` por `cut`.
+   - Scatterplot de `depth` vs `price`.
+   - Heatmap entre `depth`, `table`, y `price`.
+
+---
+
+### TO DO 2: Análisis de `table`
+1. **Relaciones clave**:
+   - Analiza la proporción de `table` ideal (53%-57%) frente a otras variables (`price`, `cut`, `clarity`).
+2. **Gráficos sugeridos**:
+   - Histograma de `table` con el rango ideal resaltado.
+   - Scatterplot entre `table` y `price`, con rango ideal sombreado.
+
+---
+
+### TO DO 3: Relación de `price` con otras variables
+1. **Factores principales**: `carat`, `cut`, `color`, y `clarity`.
+2. **Gráficos sugeridos**:
+   - Scatterplot de `carat` vs `price` con escala logarítmica.
+   - Boxplot de `price` por `cut`, `color`, y `clarity`.
+   - Heatmap de precios promedio por combinaciones de `cut` y `color`.
+
+---
+
+### TO DO 4: Impacto del `color`
+1. **Relaciones clave**:
+   - Precio por color.
+   - Frecuencia de cada grado de color (`D` a `J`).
+   - Relación entre `color` y claridad (`clarity`).
+2. **Gráficos sugeridos**:
+   - Boxplot de `price` por `color`.
+   - Countplot de combinaciones de `color` y `clarity`.
+
+---
+
+### TO DO 5: Relación Peso-Precio
+1. **Relaciones clave**:
+   - Relación exponencial entre `carat` y `price`.
+   - Distribución de precios por rangos de peso.
+   - Impacto de `cut`, `color`, y `clarity` en la relación peso-precio.
+2. **Gráficos sugeridos**:
+   - Scatterplot de `carat` vs `price` con rangos.
+   - Boxplot por rangos de peso.
+
+---
+
+### TO DO 6: Relación Volumen-Precio
+1. **Cálculo del volumen**:
+   \[
+   \text{volumen} = x \cdot y \cdot z
+   \]
+2. **Gráficos sugeridos**:
+   - Scatterplot entre `volume` y `price`.
+   - Heatmap de volumen promedio por `color` y `clarity`.
+
+---
+
+### TO DO 7: Correlaciones entre variables numéricas
+1. **Columnas clave**: `carat`, `price`, `depth`, `x`, `y`, `z`, `volume`.
+2. **Gráficos sugeridos**:
+   - Heatmap de correlaciones.
+   - Identificación de correlaciones altas (>0.5).
+
+---
+
+### TO DO 8: Análisis de valores atípicos
+1. **Métodos para identificar outliers**:
+   - Tukey (IQR).
+   - Desviaciones estándar.
+2. **Gráficos sugeridos**:
+   - Boxplot para detectar outliers.
+   - Scatterplot que resalte outliers.
+
+---
+
+### TO DO 9: Rellenar con moda de la categoría más cercana
+1. **Método**:
+   - Agrupar por columnas categóricas y usar la moda de la categoría más cercana.
+2. **Ejemplo**:
+   ```python
+   df['z'] = df.groupby(['cut', 'color', 'clarity'])['z'].transform(lambda x: x.fillna(x.mode()[0]))
+   ```
+
+---
+
+### TO DO 10: Guardar encodings
+1. **Encodings relevantes**:
+   - `cut_int`, `clarity_int`, `color_int`.
+2. **Métodos de almacenamiento**:
+   - Archivo JSON para mapeos.
+   - Archivo CSV para DataFrame completo.
+
+---
+
+### TO DO 11: DataFrame sin outliers
+1. **Filtro de outliers**:
+   - Usar métodos como IQR o percentiles ajustados.
+2. **Función sugerida**:
+   ```python
+   def remove_outliers(df, columns):
+       ...
+   ```
+
+---
+
+### TO DO 12: Precios sesgados
+1. **Transformaciones**:
+   - Logarítmica, raíz cuadrada o cúbica.
+
+---
+
+### TO DO 13: Transformaciones alternativas
+1. **Visualizaciones comparativas**:
+   - Histogramas antes y después de aplicar transformaciones.
+
+---
+
+### TO DO 14: Margen para quitar outliers
+1. **Ajuste dinámico de márgenes**:
+   - Usar percentiles más restrictivos.
+
+---
+
+### TO DO 15: Superposición de gráficos
+1. **Gráficos sugeridos**:
+   - Superponer `price` y `price_per_carat` en un mismo gráfico usando ejes dobles.
+
+---
+
+Este es el resumen refinado. ¿Quieres que implemente alguna parte directamente? 😊
+
+
+
+Los valores únicos de de la columna color son: ['E', 'I', 'J', 'H', 'F', 'G', 'D']
+
+
+Los valores únicos de de la columna clarity son: ['SI2', 'SI1', 'VS1', 'VS2', 'VVS2', 'VVS1', 'I1', 'IF']
+
+
+
+
+
+
+
+
+Gracias por la aclaración. Con el DataFrame de diamantes, puedo identificar las relaciones más significativas basándome en las correlaciones y los patrones comunes en el dataset.
+
+### **Relaciones a Explorar**
+1. **Precio (`price`) vs. Peso (`carat`)**
+   - **Por qué es interesante**: Es una relación clave, ya que el peso es uno de los factores más determinantes del precio. La correlación tiende a ser alta y positiva.
+   - **Cómo analizarlo**: Un scatterplot con un ajuste de regresión.
+
+2. **Dimensiones (`x`, `y`, `z`) vs. Volumen (`volume`)**
+   - **Por qué es interesante**: Estas variables están directamente relacionadas con el volumen. Explorar cómo estas dimensiones afectan otras métricas, como el precio, puede ser valioso.
+   - **Cómo analizarlo**: Matriz de dispersión (pairplot) entre `x`, `y`, `z`, `volume`, y `price`.
+
+3. **Profundidad (`depth`) vs. Precio**
+   - **Por qué es interesante**: `depth` representa la proporción entre altura y ancho del diamante. Valores fuera del rango óptimo pueden reducir el precio.
+   - **Cómo analizarlo**: Scatterplot de `depth` vs. `price`, categorizado por `cut`.
+
+4. **Table (`table`) vs. Precio**
+   - **Por qué es interesante**: La proporción de `table` afecta la reflectividad del diamante. Al igual que `depth`, valores fuera del rango ideal pueden afectar el precio.
+   - **Cómo analizarlo**: Boxplot de `table` categorizado por `price`.
+
+5. **Precio (`price`) vs. Claridad (`clarity`) y Color (`color`)**
+   - **Por qué es interesante**: Estos son factores cualitativos que afectan el precio. Las categorías más altas (como claridad "IF" y color "D") tienden a estar asociadas con precios más altos.
+   - **Cómo analizarlo**: Heatmap del precio promedio por combinaciones de claridad y color.
+
+---
+
+### **Pasos Siguientes**
+Podemos extraer estas correlaciones directamente del dataset de diamantes:
+
+#### **Calcular las Correlaciones Relevantes**
+```python
+# Calcular correlaciones entre las columnas relevantes
+corr_columns = ['price', 'carat', 'depth', 'table', 'x', 'y', 'z', 'volume']
+corr_matrix = df[corr_columns].corr()
+
+# Filtrar correlaciones significativas (> 0.5 o < -0.5)
+corr_pairs = corr_matrix.unstack().sort_values(kind="quicksort")
+high_corr = corr_pairs[(corr_pairs > 0.5) & (corr_pairs < 1)]
+print("Correlaciones Altas:\n", high_corr)
+```
+
+#### **Generar Visualizaciones**
+1. **Scatterplot para `price` y `carat`:**
+   ```python
+   sns.scatterplot(data=df, x='carat', y='price', hue='cut', palette='cool')
+   plt.title("Relación entre Carat y Precio por Corte")
+   plt.show()
+   ```
+
+2. **Heatmap de Precio Promedio por Color y Claridad:**
+   ```python
+   heatmap_data = df.groupby(['color', 'clarity'])['price'].mean().unstack()
+   sns.heatmap(heatmap_data, annot=True, fmt=".0f", cmap="coolwarm")
+   plt.title("Precio Promedio por Color y Claridad")
+   plt.show()
+   ```
+
+---
+
+¿Te gustaría que genere una lista de análisis más específicos o gráficos adicionales para explorar? 😊
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Los **plots tipo violín** son útiles para observar la distribución y densidad de los datos categóricos contra una variable continua. En el dataset de diamantes, estas son las columnas más interesantes para usar en **plots de violín**:
+
+---
+
+### **1. `price` (Precio)**
+   - **Por qué:** Es la variable dependiente más importante, y analizar cómo cambia según categorías como `cut`, `color` o `clarity` es fundamental.
+   - **Plots sugeridos:**
+     - `cut` vs `price`: Comparar cómo los diferentes cortes afectan el precio.
+     - `color` vs `price`: Ver cómo cambia la distribución del precio con diferentes grados de color.
+     - `clarity` vs `price`: Identificar patrones en los precios por niveles de claridad.
+   - **Ejemplo:**
+     ```python
+     sns.violinplot(data=df, x='cut', y='price', palette='muted')
+     plt.title("Distribución de Precio por Tipo de Corte")
+     plt.xlabel("Tipo de Corte")
+     plt.ylabel("Precio (USD)")
+     plt.show()
+     ```
+
+---
+
+### **2. `carat` (Peso)**
+   - **Por qué:** El peso es un factor clave en la valoración de los diamantes. Observar su distribución por categorías es útil para entender su impacto.
+   - **Plots sugeridos:**
+     - `cut` vs `carat`: Identificar si los cortes específicos tienen un peso promedio mayor o menor.
+     - `color` vs `carat`: Explorar cómo el color se relaciona con el peso.
+     - `clarity` vs `carat`: Ver si los diamantes más claros tienen un peso promedio distinto.
+   - **Ejemplo:**
+     ```python
+     sns.violinplot(data=df, x='color', y='carat', palette='pastel')
+     plt.title("Distribución de Peso (Carat) por Color")
+     plt.xlabel("Color")
+     plt.ylabel("Peso (Carat)")
+     plt.show()
+     ```
+
+---
+
+### **3. `depth` (Proporción de Profundidad)**
+   - **Por qué:** La profundidad del diamante puede afectar su apariencia y calidad visual. Analizarla por categorías ayuda a entender cómo se comporta.
+   - **Plots sugeridos:**
+     - `cut` vs `depth`: Comparar la profundidad promedio entre diferentes tipos de corte.
+     - `color` vs `depth`: Explorar si hay variación en la profundidad según el color.
+   - **Ejemplo:**
+     ```python
+     sns.violinplot(data=df, x='cut', y='depth', palette='cool')
+     plt.title("Distribución de Profundidad por Tipo de Corte")
+     plt.xlabel("Tipo de Corte")
+     plt.ylabel("Profundidad (%)")
+     plt.show()
+     ```
+
+---
+
+### **4. `table` (Proporción de la Tabla)**
+   - **Por qué:** La proporción de la tabla afecta la reflectividad y brillo del diamante. Evaluar su distribución es clave.
+   - **Plots sugeridos:**
+     - `cut` vs `table`: Ver qué cortes tienen proporciones de tabla más altas o bajas.
+     - `color` vs `table`: Explorar si hay patrones interesantes entre tabla y color.
+   - **Ejemplo:**
+     ```python
+     sns.violinplot(data=df, x='cut', y='table', palette='coolwarm')
+     plt.title("Distribución de Table por Tipo de Corte")
+     plt.xlabel("Tipo de Corte")
+     plt.ylabel("Proporción de Table (%)")
+     plt.show()
+     ```
+
+---
+
+### **5. `price_per_carat` (Precio por Quilate)**
+   - **Por qué:** Proporciona una perspectiva más equilibrada del valor, considerando tanto el precio como el peso.
+   - **Plots sugeridos:**
+     - `clarity` vs `price_per_carat`: Analizar el impacto de la claridad en el valor relativo.
+     - `color` vs `price_per_carat`: Ver cómo cambia el precio por quilate según el color.
+   - **Ejemplo:**
+     ```python
+     df['price_per_carat'] = df['price'] / df['carat']
+     sns.violinplot(data=df, x='clarity', y='price_per_carat', palette='Set2')
+     plt.title("Distribución de Precio por Quilate según Claridad")
+     plt.xlabel("Claridad")
+     plt.ylabel("Precio por Quilate (USD)")
+     plt.show()
+     ```
+
+---
+
+### **Conclusión**
+Las columnas **categóricas** como `cut`, `color`, `clarity` funcionan mejor como eje `x`, mientras que las variables **continuas** como `price`, `carat`, `depth`, `table` y `price_per_carat` son ideales para el eje `y`. Estas combinaciones ofrecen una visión clara de cómo se distribuyen las características importantes del diamante en función de las categorías. 😊
+
+¿Te interesa que genere alguno de estos gráficos o un análisis más detallado?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Los **boxplots** son ideales para comparar la **distribución** de una variable continua en relación con variables categóricas. En el dataset de diamantes, las combinaciones más útiles serían las siguientes:
+
+---
+
+### **1. Precio (`price`)**
+   - **Por qué:** Es la variable más importante del dataset, y analizar cómo varía según diferentes categorías ayuda a entender los factores que afectan su valor.
+   - **Combinaciones útiles:**
+     - `cut` vs `price`: Cómo varía el precio según la calidad del corte.
+     - `color` vs `price`: Cómo el grado de color influye en el precio.
+     - `clarity` vs `price`: Cómo la claridad afecta el precio.
+     - `price_category` (si existe) vs `price`: Comparar precios por rangos categorizados.
+   - **Ejemplo:**
+     ```python
+     sns.boxplot(data=df, x='cut', y='price', palette='Set2')
+     plt.title("Distribución de Precios por Tipo de Corte")
+     plt.xlabel("Tipo de Corte")
+     plt.ylabel("Precio (USD)")
+     plt.show()
+     ```
+
+---
+
+### **2. Peso (`carat`)**
+   - **Por qué:** El peso en quilates es un factor determinante del precio, pero también es interesante observar su relación con otras características.
+   - **Combinaciones útiles:**
+     - `cut` vs `carat`: Cómo el peso varía según la calidad del corte.
+     - `color` vs `carat`: Diamantes más grandes podrían tener colores inferiores debido a su rareza.
+     - `clarity` vs `carat`: Si los diamantes más grandes tienden a tener menor claridad.
+   - **Ejemplo:**
+     ```python
+     sns.boxplot(data=df, x='clarity', y='carat', palette='cool')
+     plt.title("Distribución del Peso (Carat) según Claridad")
+     plt.xlabel("Claridad")
+     plt.ylabel("Peso (Carat)")
+     plt.show()
+     ```
+
+---
+
+### **3. Proporción de Profundidad (`depth`)**
+   - **Por qué:** La profundidad afecta la calidad visual del diamante. Es interesante ver cómo se distribuye en función de las categorías.
+   - **Combinaciones útiles:**
+     - `cut` vs `depth`: Cortes de mejor calidad deberían tener una profundidad más cercana al rango ideal.
+     - `color` vs `depth`: Explorar si hay patrones interesantes entre color y profundidad.
+     - `clarity` vs `depth`: Observar si la profundidad varía significativamente según la claridad.
+   - **Ejemplo:**
+     ```python
+     sns.boxplot(data=df, x='cut', y='depth', palette='pastel')
+     plt.title("Distribución de Profundidad según Tipo de Corte")
+     plt.xlabel("Tipo de Corte")
+     plt.ylabel("Proporción de Profundidad (%)")
+     plt.show()
+     ```
+
+---
+
+### **4. Proporción de la Tabla (`table`)**
+   - **Por qué:** El tamaño de la tabla afecta la reflectividad y brillo del diamante. Es interesante comparar su distribución.
+   - **Combinaciones útiles:**
+     - `cut` vs `table`: Relación entre la tabla y la calidad del corte.
+     - `color` vs `table`: Cómo varía la tabla según el color.
+     - `clarity` vs `table`: Si la tabla es más uniforme en diamantes más claros.
+   - **Ejemplo:**
+     ```python
+     sns.boxplot(data=df, x='color', y='table', palette='coolwarm')
+     plt.title("Distribución de Proporción de Tabla según Color")
+     plt.xlabel("Color")
+     plt.ylabel("Proporción de Tabla (%)")
+     plt.show()
+     ```
+
+---
+
+### **5. Precio por Quilate (`price_per_carat`)**
+   - **Por qué:** Proporciona un análisis más equilibrado al tener en cuenta el peso y el precio.
+   - **Combinaciones útiles:**
+     - `cut` vs `price_per_carat`: Identificar cómo el precio relativo cambia con la calidad del corte.
+     - `color` vs `price_per_carat`: Ver cómo el color afecta el precio relativo.
+     - `clarity` vs `price_per_carat`: Cómo la claridad influye en el valor relativo.
+   - **Ejemplo:**
+     ```python
+     df['price_per_carat'] = df['price'] / df['carat']
+     sns.boxplot(data=df, x='cut', y='price_per_carat', palette='Set3')
+     plt.title("Distribución del Precio por Quilate según Tipo de Corte")
+     plt.xlabel("Tipo de Corte")
+     plt.ylabel("Precio por Quilate (USD)")
+     plt.show()
+     ```
+
+---
+
+### **6. Relación entre Categorías (Opcional)**
+   - **Por qué:** Comparar la distribución de métricas físicas como `carat`, `depth`, o `table` entre combinaciones de categorías es interesante para evaluar patrones generales.
+   - **Combinaciones útiles:**
+     - `cut` vs `depth` vs `clarity`: Analizar cómo la profundidad varía según el corte y la claridad.
+     - `color` vs `price_per_carat` vs `clarity`: Explorar cómo el precio relativo cambia según el color y la claridad.
+   - **Ejemplo:**
+     ```python
+     sns.boxplot(data=df, x='cut', y='depth', hue='clarity', palette='viridis')
+     plt.title("Profundidad por Tipo de Corte y Claridad")
+     plt.xlabel("Tipo de Corte")
+     plt.ylabel("Proporción de Profundidad (%)")
+     plt.legend(title="Claridad")
+     plt.show()
+     ```
+
+---
+
+### **Conclusión**
+Los **boxplots** son particularmente útiles para las siguientes combinaciones:
+- **Categóricas:** `cut`, `color`, `clarity`.
+- **Continuas:** `price`, `carat`, `depth`, `table`, y `price_per_carat`.
+
+Estas combinaciones te permiten explorar patrones y distribuciones significativas en el dataset. ¿Te interesa generar algunos ejemplos o trabajar con una combinación específica? 😊
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

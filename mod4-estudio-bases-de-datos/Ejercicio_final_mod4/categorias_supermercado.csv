@@ -1,0 +1,21 @@
+id_categoria,nombre_categoria
+1,Frutas y Verduras
+2,Carnicería
+3,Pescadería
+4,Panadería
+5,Lácteos
+6,Congelados
+7,"Bebidas (refrescos, jugos, etc.)"
+8,Alimentos enlatados
+9,Productos de limpieza
+10,Artículos de higiene personal
+11,Cosméticos y cuidado de la piel
+12,Comidas preparadas
+13,Snacks y golosinas
+14,Cereales y galletas
+15,Productos sin gluten
+16,Vinos y licores
+17,Productos dietéticos y saludables
+18,Productos para mascotas
+19,Perfumería
+20,"Hogar (artículos para el hogar como utensilios, herramientas, etc.)"
