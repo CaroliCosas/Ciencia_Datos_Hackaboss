@@ -50,13 +50,17 @@ Alternativa: exportar desde Google Colab
 * Preprocesados (20%)
     * numéricas: imputer, scaler, transformer
     * categóricas: imputer, encoder
+    * Si queremos codificar de forma ordinal columnas de la entrada X : OrdinalEncoder: 0, 1, 2, 3, 4,5 ,6....
+    * OneHotEncoder en la entrada para no introducir orden ficticio, si esto genera muchas columnas luego podemos usar PCA o SelectKBest para reducirlas
     * Requisito: hacer los preprocesados con Scikit Learn en lugar de métodos de pandas
 * clustering y siluetas (10 %)
     * Crear una columna cluster usando KMeans o cualquier otro algoritmo de Clustering
     * Usar esa columna para hacer algún gráfico EDA como hue para colorear con scatterplot
 * feature selection (10%)
-    * SelectKBest para filtrar las mejores columnas y probar
-    * PCA 
+    * SelectKBest para filtrar las mejores columnas y probar - Probar este para regresión
+    * PCA - Probar este para clasificación
+    * probar los dos pero quedarse con uno, o comparar resultados con ambos
+    * Hay pocas columnas, por lo que esta fase no sería tan relevante
 * Regresión (20%):
     * Predecir la columna 'price'
 * Clasificación multiclase (20%)
@@ -72,8 +76,19 @@ Alternativa: exportar desde Google Colab
         * Opción 3: una primera parte con transformaciones manuales y una segunda parte con Pipeline
         * En ambos casos sería interesante calcular las métricas para ver qué técnicas de preprocesado van mejor
     * Vectorizar la columna texto 'name' y usar TruncatedSVD
-    * Clasificación multiclase 'room_type' con TensorFlow-Keras
+    * Clasificación multiclase 'room_type' o regresión sobre price con TensorFlow-Keras
     * SMOTE si hay desbalanceo para el problema de clasificación multiclase 'room_type'
+    * Crear un apartado independiente donde se eliminen filas cuya last_review sea null, y trata la fecha por ejemplo con df['last_review].dt.year o month o day para sacar año mes y día y poder usarlos como 3 columnas de entrada.
+    * Transformar distribución de la variable objetivo 'price': En caso de querer transformar precio:
+        * manual sin pipeline:
+            * train_test_split
+            * hacer transformación de precio (por ejemplo logarítmica) para y_train
+            * hacer fit: model.fit(X_train, y_train_log)
+            * y_pred_log = model.predict
+            * deshacer transformación precio: inverse_transform o np.exp(y_pred_log) para obtener y_pred normal
+        * automática con pipeline:
+            * requiere de usar clase especial combinada con el pipeline: https://scikit-learn.org/stable/modules/generated/sklearn.compose.TransformedTargetRegressor.html
+    * GridSearchCV para buscar mejores párametros en algún modelo
 
 
 Decidir dataset 10-20 columnas que se pueda hacer en 1 semana aprox o menos.
@@ -98,4 +113,16 @@ Entrega:
 
 * Domingo 23/02/2025 23:59
 * m5_nombre_apellido.ipynb
+
+* Gestión de nulos:
+    * number_of_reviews,last_review,reviews_per_month:
+        * number_of_reviews si es nan se puede dejar a 0
+        * reviews_per_month si es nan se puede dejar a 0
+        * last_review: estrategias:
+            * a la actual restar le resta last_review y sacas el número de días transcurridos
+            * fillna con un timestamp concreto 01-01-2019
+            * binarizar la columna: hay reseña o no hay reseña
+            * bfill o ffill para rellenar con fechas de las filas anteriores o posteriores
+            * Borrar filas que tengan esa columna null y quedarse con las otras si es que son suficientes
+            * Hemos decidido eliminar esta columna para simplificar.
 
